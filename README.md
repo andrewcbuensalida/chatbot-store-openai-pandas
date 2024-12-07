@@ -25,3 +25,33 @@ pip install -r requirements.txt
 
 ## To save dependencies into requirements.txt
 pip freeze > requirements.txt
+
+
+## To start app
+After activating virtual environment and installing packages 
+`cd Mock_Api`
+
+To start the orders server
+`uvicorn mock_api:app --reload --port 8001`
+
+To start the OpenAI server
+`uvicorn openai_api:app --reload`
+
+Open Postman and send a POST request to 
+`http://127.0.0.1:8000`
+
+With a JSON body
+```json 
+{
+    "message":{
+        "content": {
+            "type": "text",
+            "text": "What are the top 5 highly-rated guitar products?"
+        }
+    }
+}
+```
+
+To stop server
+`tasklist | findstr uvicorn`
+`taskkill /PID <PID> /F`
