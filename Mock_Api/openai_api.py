@@ -113,6 +113,10 @@ def insert_message(conversation_id, message):
         )
     return message_id # not really used
 
+@app.get('/health')
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/api/messages/")
 def get_all_messages():
     logger.info(f"Getting all messages for user 1")
