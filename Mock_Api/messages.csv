@@ -1,59 +1,116 @@
 conversation_id,message_id,role,content,tool_calls,tool_call_id
-1,edf5b73f-9b24-4d93-974b-3b11d8138549,system,You are a helpful assistant. You are here to help with orders data and products data. ,,
-1,ca3bfb2d-f060-4ef1-8f16-32387baf47ad,user,"[Content(type='text', text='Get me all the orders')]",,
-1,b18aa0af-278b-4e82-b3e9-8ef1742b75a7,assistant,,"[{""id"": ""call_H1mf95ewdtQjWtv4AvkVcII5"", ""function"": {""arguments"": ""{}"", ""name"": ""get_all_orders_data""}, ""type"": ""function""}]",
-1,35fa9cc2-4b12-4a82-8fb7-550d46a7d67e,tool,"{""tool_name"": ""get_all_orders_data"", ""arguments"": {}, ""response"": [{""Order_Date"": ""2018-01-02"", ""Time"": ""10:56:33"", ""Aging"": 8.0, ""Customer_Id"": 37077, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Media Players"", ""Sales"": 140.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 46.0, ""Shipping_Cost"": 4.6, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-07-24"", ""Time"": ""20:41:37"", ""Aging"": 2.0, ""Customer_Id"": 59173, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Speakers"", ""Sales"": 211.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 112.0, ""Shipping_Cost"": 11.2, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-11-08"", ""Time"": ""08:38:49"", ""Aging"": 8.0, ""Customer_Id"": 41066, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Body Covers"", ""Sales"": 117.0, ""Quantity"": 5.0, ""Discount"": 0.1, ""Profit"": 31.2, ""Shipping_Cost"": 3.1, ""Order_Priority"": ""Critical"", ""Payment_method"": ""credit_card""}]}",,call_H1mf95ewdtQjWtv4AvkVcII5
-1,22b01b4e-1659-43e8-9b3c-82a0fb4df4fc,assistant,"Here are all the orders data:
+1,e6efab3a-f98d-4a42-a63e-ade174189715,system,You are a helpful assistant. You are here to help with orders data and products data. ,,
+1,6683c4c3-f860-4a6f-871c-13876519e2a9,user,"[Content(type='text', text='get me the orders')]",,
+1,7bb4fdf1-fdd4-4172-bdb0-43a299079a61,assistant,,"[{""id"": ""call_YluiTAyzvPwV6u1mBd3GxrxO"", ""function"": {""arguments"": ""{}"", ""name"": ""get_all_orders_data""}, ""type"": ""function""}]",
+1,360830e1-f71c-48ef-a1cd-176df56c6f9e,tool,"{""tool_name"": ""get_all_orders_data"", ""arguments"": {}, ""response"": [{""Order_Date"": ""2018-01-02"", ""Time"": ""10:56:33"", ""Aging"": 8.0, ""Customer_Id"": 37077, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Media Players"", ""Sales"": 140.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 46.0, ""Shipping_Cost"": 4.6, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-07-24"", ""Time"": ""20:41:37"", ""Aging"": 2.0, ""Customer_Id"": 59173, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Speakers"", ""Sales"": 211.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 112.0, ""Shipping_Cost"": 11.2, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-11-08"", ""Time"": ""08:38:49"", ""Aging"": 8.0, ""Customer_Id"": 41066, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Body Covers"", ""Sales"": 117.0, ""Quantity"": 5.0, ""Discount"": 0.1, ""Profit"": 31.2, ""Shipping_Cost"": 3.1, ""Order_Priority"": ""Critical"", ""Payment_method"": ""credit_card""}]}",,call_YluiTAyzvPwV6u1mBd3GxrxO
+1,ef11f89a-5443-4699-8b1e-5f6c63c35c25,assistant,"Here are some order details:
 
-1. **Order Date:** 2018-01-02  
-   **Time:** 10:56:33  
-   **Aging:** 8.0  
-   **Customer ID:** 37077  
-   **Gender:** Female  
-   **Device Type:** Web  
-   **Customer Login Type:** Member  
-   **Product Category:** Auto & Accessories  
-   **Product:** Car Media Players  
-   **Sales:** $140.00  
-   **Quantity:** 1  
-   **Discount:** 30%  
-   **Profit:** $46.00  
-   **Shipping Cost:** $4.60  
-   **Order Priority:** Medium  
-   **Payment Method:** Credit Card  
+1. **Order Date:** 2018-01-02
+   - **Time:** 10:56:33
+   - **Customer ID:** 37077
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Media Players
+   - **Sales:** $140
+   - **Quantity:** 1
+   - **Discount:** 30%
+   - **Profit:** $46
+   - **Shipping Cost:** $4.6
+   - **Order Priority:** Medium
+   - **Payment Method:** Credit Card
 
-2. **Order Date:** 2018-07-24  
-   **Time:** 20:41:37  
-   **Aging:** 2.0  
-   **Customer ID:** 59173  
-   **Gender:** Female  
-   **Device Type:** Web  
-   **Customer Login Type:** Member  
-   **Product Category:** Auto & Accessories  
-   **Product:** Car Speakers  
-   **Sales:** $211.00  
-   **Quantity:** 1  
-   **Discount:** 30%  
-   **Profit:** $112.00  
-   **Shipping Cost:** $11.20  
-   **Order Priority:** Medium  
-   **Payment Method:** Credit Card  
+2. **Order Date:** 2018-07-24
+   - **Time:** 20:41:37
+   - **Customer ID:** 59173
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Speakers
+   - **Sales:** $211
+   - **Quantity:** 1
+   - **Discount:** 30%
+   - **Profit:** $112
+   - **Shipping Cost:** $11.2
+   - **Order Priority:** Medium
+   - **Payment Method:** Credit Card
 
-3. **Order Date:** 2018-11-08  
-   **Time:** 08:38:49  
-   **Aging:** 8.0  
-   **Customer ID:** 41066  
-   **Gender:** Female  
-   **Device Type:** Web  
-   **Customer Login Type:** Member  
-   **Product Category:** Auto & Accessories  
-   **Product:** Car Body Covers  
-   **Sales:** $117.00  
-   **Quantity:** 5  
-   **Discount:** 10%  
-   **Profit:** $31.20  
-   **Shipping Cost:** $3.10  
-   **Order Priority:** Critical  
-   **Payment Method:** Credit Card  
+3. **Order Date:** 2018-11-08
+   - **Time:** 08:38:49
+   - **Customer ID:** 41066
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Body Covers
+   - **Sales:** $117
+   - **Quantity:** 5
+   - **Discount:** 10%
+   - **Profit:** $31.2
+   - **Shipping Cost:** $3.1
+   - **Order Priority:** Critical
+   - **Payment Method:** Credit Card
 
-If you need more detailed information or further analysis, feel free to ask!",,
+These orders cover various products in the ""Auto & Accessories"" category. If you need more information, let me know!",,
+1,2884262b-02b9-4340-bb44-28d95281771f,user,"[Content(type='text', text='my name is andrew')]",,
+1,7cc6ee86-51ac-496a-949e-abb6eb019619,assistant,Hello Andrew! How can I assist you today?,,
+1,24e97341-1162-4f96-b089-78175a0adbb8,user,"[Content(type='text', text='whats a nickname to my name?')]",,
+1,378e3d7c-95a9-4cc0-8300-acdc8b305ec1,assistant,"A common nickname for Andrew is ""Andy."" Some other variations could be ""Drew"" or ""Andi."" Do you have a preference for any of these, or would you like more suggestions?",,
+1,60e00cf5-fd2f-4386-9e9c-67bfb948d966,user,"[Content(type='text', text='get me all the orders')]",,
+1,5312192a-e4db-4969-8568-64ec02484ab7,assistant,,"[{""id"": ""call_F9A1es5MOOXre7N4SzpBYkVo"", ""function"": {""arguments"": ""{}"", ""name"": ""get_all_orders_data""}, ""type"": ""function""}]",
+1,e4f526e0-f6b8-48dc-a6b4-489538d27553,tool,"{""tool_name"": ""get_all_orders_data"", ""arguments"": {}, ""response"": [{""Order_Date"": ""2018-01-02"", ""Time"": ""10:56:33"", ""Aging"": 8.0, ""Customer_Id"": 37077, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Media Players"", ""Sales"": 140.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 46.0, ""Shipping_Cost"": 4.6, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-07-24"", ""Time"": ""20:41:37"", ""Aging"": 2.0, ""Customer_Id"": 59173, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Speakers"", ""Sales"": 211.0, ""Quantity"": 1.0, ""Discount"": 0.3, ""Profit"": 112.0, ""Shipping_Cost"": 11.2, ""Order_Priority"": ""Medium"", ""Payment_method"": ""credit_card""}, {""Order_Date"": ""2018-11-08"", ""Time"": ""08:38:49"", ""Aging"": 8.0, ""Customer_Id"": 41066, ""Gender"": ""Female"", ""Device_Type"": ""Web"", ""Customer_Login_type"": ""Member"", ""Product_Category"": ""Auto & Accessories"", ""Product"": ""Car Body Covers"", ""Sales"": 117.0, ""Quantity"": 5.0, ""Discount"": 0.1, ""Profit"": 31.2, ""Shipping_Cost"": 3.1, ""Order_Priority"": ""Critical"", ""Payment_method"": ""credit_card""}]}",,call_F9A1es5MOOXre7N4SzpBYkVo
+1,e94760b5-f37d-4c97-ae22-0fc9ed2ab956,assistant,"Here are the details of all the orders we have:
+
+1. **Order Date:** 2018-01-02
+   - **Time:** 10:56:33
+   - **Customer ID:** 37077
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Media Players
+   - **Sales:** $140
+   - **Quantity:** 1
+   - **Discount:** 30%
+   - **Profit:** $46
+   - **Shipping Cost:** $4.6
+   - **Order Priority:** Medium
+   - **Payment Method:** Credit Card
+
+2. **Order Date:** 2018-07-24
+   - **Time:** 20:41:37
+   - **Customer ID:** 59173
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Speakers
+   - **Sales:** $211
+   - **Quantity:** 1
+   - **Discount:** 30%
+   - **Profit:** $112
+   - **Shipping Cost:** $11.2
+   - **Order Priority:** Medium
+   - **Payment Method:** Credit Card
+
+3. **Order Date:** 2018-11-08
+   - **Time:** 08:38:49
+   - **Customer ID:** 41066
+   - **Gender:** Female
+   - **Device Type:** Web
+   - **Customer Login Type:** Member
+   - **Product Category:** Auto & Accessories
+   - **Product:** Car Body Covers
+   - **Sales:** $117
+   - **Quantity:** 5
+   - **Discount:** 10%
+   - **Profit:** $31.2
+   - **Shipping Cost:** $3.1
+   - **Order Priority:** Critical
+   - **Payment Method:** Credit Card
+
+If you need more details or have any specific queries related to these orders, feel free to ask!",,
+1,7c7e50c5-47d3-48e5-af30-45e98bb6af43,user,"[Content(type='text', text='whats my name again')]",,
+1,c2a497f4-7126-410a-bee3-7f4668ac750b,assistant,Your name is Andrew. ,,

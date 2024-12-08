@@ -62,41 +62,27 @@ def select_messages(conversation_id):
         reader = csv.DictReader(file)
         for row in reader:
             if int(row['conversation_id']) == conversation_id:
-                messages.append({
-                    "role": row['role'],
-                    "content": row['content']
-                })
+                messages.append(
+                    {
+                        **row,
+                        "tool_calls": json.loads(row["tool_calls"]) if row["tool_calls"] else None
+                    }
+                )
     return messages
 
 @with_retries
 def insert_message(conversation_id, message):
     logger.info(f"Inserting message: {message}")
     message_id = str(uuid.uuid4())
-    if isinstance(message, dict):
-      role = message['role']
-      content = message['content']
-      tool_calls = None
-      tool_call_id = message.get('tool_call_id')
-    else:
-        role = message.role
-        content = message.content
-        if message.tool_calls:
-            tool_calls = json.dumps([tool_call.to_dict() for tool_call in message.tool_calls]) 
-        else:
-            tool_calls = None
-        tool_call_id = None
-
-    logger.debug(f"Inserting message: {tool_calls}")
     with open('messages.csv', mode='a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=['conversation_id', 'message_id', 'role', 'content',"tool_calls", "tool_call_id"])
-        writer.writerow({
-            'conversation_id': conversation_id, 
-            'message_id': message_id, 
-            'role': role, 
-            'content': content,
-            "tool_calls": tool_calls,
-            "tool_call_id": tool_call_id
-        })
+        writer.writerow(
+            {
+                "conversation_id": conversation_id,
+                "message_id": message_id,
+                **message,
+            }
+        )
     return message_id # not really used
 
 @app.post("/")
@@ -131,9 +117,14 @@ def chat_completions_create(request: ChatRequest):
             tools=tool_schemas
         )
 
+        response_message = {
+            "role": response.choices[0].message.role,
+            "content": response.choices[0].message.content,
+            "tool_calls": json.dumps([tool_call.dict() for tool_call in response.choices[0].message.tool_calls]) if response.choices[0].message.tool_calls else None,
+        }
         logger.debug(response.choices[0])
         messages.append(response.choices[0].message)
-        insert_message(1, response.choices[0].message)
+        insert_message(1, response_message)
 
 
         if response.choices[0].finish_reason == "tool_calls":
