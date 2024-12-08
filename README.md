@@ -44,10 +44,12 @@ With a JSON body
 ```json 
 {
     "message":{
-        "content": {
-            "type": "text",
-            "text": "What are the top 5 highly-rated guitar products?"
-        }
+        "content": [
+            {
+                "type": "text",
+                "text": "What are the top 5 highly-rated guitar products?"
+            }
+        ]
     }
 }
 ```

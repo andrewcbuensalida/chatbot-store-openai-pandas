@@ -1,36 +1,164 @@
+import json
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
 import os
 import requests
 from dotenv import load_dotenv
+from loguru import logger
+from tools import tool_schemas, execute_tool_call
+from with_retries import with_retries
+from types_local import ChatRequest
+import csv
+import uuid
 
 load_dotenv()
+
+# Configure logger to write logs to a file
+logger.add("./log/openai_api.log", rotation="10 MB", retention="10 days", level="DEBUG")
 
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 app = FastAPI(title="E-commerce Dataset API", description="API for querying e-commerce sales data")
 
-class Content(BaseModel):
-    type: str
-    text: str
-
-class Message(BaseModel):
-    content: Content
-
-class ChatRequest(BaseModel):
-    message: Message
-
 orders_endpoint = "http://localhost:8001/data"
 
-message_history = []
+# TODO try except
+def get_all_orders_data():
+    response = requests.get(orders_endpoint)
+    return response.json()[:3] # it's going to be too much to pass to openai if we don't limit it
+
+current_agent = {
+    "name": "Anderson",
+    "tools": [get_all_orders_data],
+    "instructions": "You are a helpful assistant. You are here to help with orders data and products data. "
+}
+
+tools = {tool.__name__: tool for tool in current_agent['tools']}
+
+system_message = {
+    "conversation_id": 1,
+    "message_id": str(uuid.uuid4()),
+    "role": 'system',
+    "content": current_agent["instructions"]
+}
+
+@with_retries
+def openai_chat_completion_create(**kwargs):
+  logger.info(f"Sending message to OpenAI: {kwargs['messages'][-1]['content']}")
+  response = client.chat.completions.create(
+    model="gpt-4o",
+    parallel_tool_calls=True,
+    **kwargs
+  )
+
+  return response
+
+@with_retries
+def select_messages(conversation_id):
+    logger.info(f"Selecting messages for conversation: {conversation_id}")
+    messages = []
+    with open('messages.csv', mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if int(row['conversation_id']) == conversation_id:
+                messages.append({
+                    "role": row['role'],
+                    "content": row['content']
+                })
+    return messages
+
+@with_retries
+def insert_message(conversation_id, message):
+    logger.info(f"Inserting message: {message}")
+    message_id = str(uuid.uuid4())
+    if isinstance(message, dict):
+      role = message['role']
+      content = message['content']
+      tool_calls = None
+      tool_call_id = message.get('tool_call_id')
+    else:
+        role = message.role
+        content = message.content
+        if message.tool_calls:
+            tool_calls = json.dumps([tool_call.to_dict() for tool_call in message.tool_calls]) 
+        else:
+            tool_calls = None
+        tool_call_id = None
+
+    logger.debug(f"Inserting message: {tool_calls}")
+    with open('messages.csv', mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=['conversation_id', 'message_id', 'role', 'content',"tool_calls", "tool_call_id"])
+        writer.writerow({
+            'conversation_id': conversation_id, 
+            'message_id': message_id, 
+            'role': role, 
+            'content': content,
+            "tool_calls": tool_calls,
+            "tool_call_id": tool_call_id
+        })
+    return message_id # not really used
 
 @app.post("/")
 def chat_completions_create(request: ChatRequest):
-    print(f"Received: {request.message.content.text}")
-    response = requests.get(orders_endpoint)
-    if response.status_code == 200:
-      orders_data = response.json()
-    else:
-      orders_data = {"error": "Failed to fetch data"}
-    return {"message": f"Received: {request.message.content.text}"}
+    print(f"Received: {request.message.content[0].text}")
+    
+    # only have one conversation for now
+    messages = select_messages(1)
+
+    # If it's a new conversation, add the system message
+    # TODO try except
+    if not messages:
+        messages.append(system_message)
+        insert_message(1, system_message) 
+
+    new_user_message = {
+        "conversation_id": 1,
+        "message_id": str(uuid.uuid4()),
+        "role": "user",
+        "content": request.message.content
+    }
+    messages.append(new_user_message)
+    insert_message(1, new_user_message)
+
+    limit = 3
+    attempts = 0
+    # Loop so openai can respond to tool messages
+    while attempts < limit:
+        logger.info(f"Attempt {attempts + 1}/{limit}")
+        response = openai_chat_completion_create(
+            messages=messages,
+            tools=tool_schemas
+        )
+
+        logger.debug(response.choices[0])
+        messages.append(response.choices[0].message)
+        insert_message(1, response.choices[0].message)
+
+
+        if response.choices[0].finish_reason == "tool_calls":
+            # Loop through all tool calls and execute
+            for tool_call in response.choices[0].message.tool_calls:
+                response = execute_tool_call(
+                    tool_call, 
+                    tools, 
+                    current_agent["name"]
+                )
+                logger.debug(response)
+
+                tool_message = {
+                    "role": "tool",
+                    "content": json.dumps(
+                        {
+                            "tool_name": tool_call.function.name,
+                            "arguments": json.loads(tool_call.function.arguments),
+                            "response": response
+                        }
+                    ),
+                    "tool_call_id": tool_call.id
+                }
+                messages.append(tool_message)
+                insert_message(1, tool_message)
+        else:
+            logger.info(response.choices[0].message.content)
+            return {"message": response.choices[0].message.content}
