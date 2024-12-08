@@ -26,12 +26,9 @@ app = FastAPI(title="E-commerce Dataset API", description="API for querying e-co
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Adjust this to your needs
-    # allow_credentials=True,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
-    expose_headers=["strict-origin-when-cross-origin"]
 )
 orders_endpoint = "http://localhost:8001/data"
 

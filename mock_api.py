@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import pandas as pd
 
 # Load dataset
-DATASET_PATH = "../Data/Order_Data_Dataset.csv"
+DATASET_PATH = "./Data/Order_Data_Dataset.csv"
 df = pd.read_csv(DATASET_PATH)
 
 # Initialize FastAPI app
