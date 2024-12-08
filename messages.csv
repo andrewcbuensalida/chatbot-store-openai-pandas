@@ -1,1 +1,4 @@
 conversation_id,message_id,role,content,tool_calls,tool_call_id
+jakkpv47k,eedb9f37-ac0c-4ba7-b604-6f5d0209470e,system,"[{""type"": ""text"", ""text"": ""You are a helpful assistant. You are here to help with orders data and products data. ""}]",,
+jakkpv47k,tf6uzt3zc,user,"[{""type"": ""text"", ""text"": ""get all orders""}]",,
+jakkpv47k,e486cb2b-895b-43d4-a774-0261df1193c0,assistant,"[{""type"": ""text"", ""text"": null}]","[{""id"": ""call_tiUqZDhWcjOsb10ZZDCNlSY4"", ""function"": {""arguments"": ""{}"", ""name"": ""get_all_orders_data""}, ""type"": ""function""}]",

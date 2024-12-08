@@ -30,7 +30,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-orders_endpoint = "http://localhost:8001/data"
+orders_endpoint = os.getenv('ORDERS_ENDPOINT', "http://localhost:8001/data")
 
 # TODO try except
 def get_all_orders_data():
