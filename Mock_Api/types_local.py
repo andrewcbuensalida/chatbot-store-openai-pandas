@@ -7,6 +7,7 @@ class Content(BaseModel):
 class Message(BaseModel):
   content: list[Content]
   conversationId: str
+  messageId: str
 
 class ChatRequest(BaseModel):
     message: Message

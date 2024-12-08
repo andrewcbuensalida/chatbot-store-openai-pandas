@@ -49,17 +49,7 @@ current_agent = {
 
 tools = {tool.__name__: tool for tool in current_agent['tools']}
 
-system_message = {
-    "conversation_id": 1,
-    "message_id": str(uuid.uuid4()),
-    "role": 'system',
-    "content": [
-        {
-            "type":"text",
-            "text":current_agent["instructions"]
-        }
-    ]
-}
+
 
 @with_retries
 def openai_chat_completion_create(**kwargs):
@@ -117,6 +107,7 @@ def insert_message(conversation_id, message):
                 "conversation_id": conversation_id,
                 "message_id": message_id,
                 **message,
+                "content": json.dumps(message.get('content')) if message.get('content') else None,
                 "tool_calls": json.dumps([tool_call.dict() for tool_call in message.get('tool_calls')]) if message.get('tool_calls') else None
             }
         )
@@ -134,18 +125,30 @@ def get_all_messages():
 def chat_completions_create(request: ChatRequest):
     print(f"Received: {request.message.content[0].text}")
     conversation_id = request.message.conversationId
+    print('''*Example conversation_id:\n''', conversation_id)
     # only have one conversation for now
     messages = select_messages_by_conversation_id(conversation_id)
 
     # If it's a new conversation, add the system message
     # TODO try except
     if not messages:
+        system_message = {
+            "conversation_id": conversation_id,
+            "message_id": str(uuid.uuid4()),
+            "role": 'system',
+            "content": [
+                {
+                    "type":"text",
+                    "text":current_agent["instructions"]
+                }
+            ]
+        }
         messages.append(system_message)
         insert_message(conversation_id, system_message) 
 
     new_user_message = {
       "conversation_id": conversation_id,
-      "message_id": str(uuid.uuid4()),
+      "message_id": request.message.messageId,
       "role": "user",
       "content": [content.dict() for content in request.message.content]
     }
@@ -171,6 +174,7 @@ def chat_completions_create(request: ChatRequest):
                 }
             ],
             "tool_calls": response.choices[0].message.tool_calls,
+            "conversation_id": conversation_id,
         }
         logger.debug(response_message)
         messages.append(response_message)
@@ -196,7 +200,8 @@ def chat_completions_create(request: ChatRequest):
                             "response": response
                         }
                     ),
-                    "tool_call_id": tool_call.id
+                    "tool_call_id": tool_call.id,
+                    "conversation_id": conversation_id,
                 }
                 messages.append(tool_message)
                 insert_message(1, tool_message)
