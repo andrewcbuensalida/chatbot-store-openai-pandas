@@ -28,9 +28,13 @@ def get_all_orders_data():
     response = requests.get(orders_endpoint)
     return response.json()[:3] # it's going to be too much to pass to openai if we don't limit it
 
+def get_orders_by_customer_id(customer_id): # example customer_id = 37077
+    response = requests.get(f"{orders_endpoint}/customer/{customer_id}")
+    return response.json()[:3] # it's going to be too much to pass to openai if we don't limit it
+
 current_agent = {
     "name": "Anderson",
-    "tools": [get_all_orders_data],
+    "tools": [get_all_orders_data,get_orders_by_customer_id],
     "instructions": "You are a helpful assistant. You are here to help with orders data and products data. "
 }
 
@@ -58,6 +62,7 @@ def openai_chat_completion_create(**kwargs):
 def select_messages(conversation_id):
     logger.info(f"Selecting messages for conversation: {conversation_id}")
     messages = []
+    # return messages # delete this line to turn on memory # need memory if getting orders by a certain filter
     with open('messages.csv', mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:

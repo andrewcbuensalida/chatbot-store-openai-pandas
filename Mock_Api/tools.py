@@ -16,5 +16,23 @@ tool_schemas = [
             "name": "get_all_orders_data",
             "description": "Get all orders data.",
         },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_orders_by_customer_id",
+            "description": "Get orders by customer ID.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "customer_id": {
+                        "type": "string",
+                        "description": "The customer's ID.",
+                    }
+                },
+                "required": ["customer_id"],
+                "additionalProperties": False,
+            },
+        },
     }
 ]
