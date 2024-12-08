@@ -28,6 +28,8 @@ pip freeze > requirements.txt
 
 
 ## To start app
+Create a .env file like example.env, then fill it in with your own API keys
+
 After activating virtual environment and installing packages 
 `cd Mock_Api`
 

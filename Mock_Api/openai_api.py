@@ -1,6 +1,7 @@
 import json
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import os
 import requests
@@ -21,6 +22,14 @@ client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 app = FastAPI(title="E-commerce Dataset API", description="API for querying e-commerce sales data")
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to your needs
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 orders_endpoint = "http://localhost:8001/data"
 
 # TODO try except
@@ -44,7 +53,12 @@ system_message = {
     "conversation_id": 1,
     "message_id": str(uuid.uuid4()),
     "role": 'system',
-    "content": current_agent["instructions"]
+    "content": [
+        {
+            "type":"text",
+            "text":current_agent["instructions"]
+        }
+    ]
 }
 
 @with_retries
@@ -59,14 +73,31 @@ def openai_chat_completion_create(**kwargs):
   return response
 
 @with_retries
-def select_messages(conversation_id):
-    logger.info(f"Selecting messages for conversation: {conversation_id}")
+def select_messages(user_id):
+    logger.info(f"Selecting messages for user: {user_id}")
     messages = []
     # return messages # delete this line to turn on memory # need memory if getting orders by a certain filter
     with open('messages.csv', mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            if int(row['conversation_id']) == conversation_id:
+            if True:
+            # if int(row['user_id']) == user_id:
+                messages.append(
+                    {
+                        **row,
+                        "tool_calls": json.loads(row["tool_calls"]) if row["tool_calls"] else None
+                    }
+                )
+    return messages
+
+@with_retries
+def select_messages_by_conversation_id(conversation_id):
+    logger.info(f"Selecting messages for conversation: {conversation_id}")
+    messages = []
+    with open('messages.csv', mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row['conversation_id'] == conversation_id:
                 messages.append(
                     {
                         **row,
@@ -86,31 +117,40 @@ def insert_message(conversation_id, message):
                 "conversation_id": conversation_id,
                 "message_id": message_id,
                 **message,
+                "tool_calls": json.dumps([tool_call.dict() for tool_call in message.get('tool_calls')]) if message.get('tool_calls') else None
             }
         )
     return message_id # not really used
 
+@app.get("/api/messages/")
+def get_all_messages():
+    logger.info(f"Getting all messages for user 1")
+    messages = select_messages(1)
+    filtered_messages = [message for message in messages if message['role'] in ['user', 'assistant'] and not message.get('tool_calls')]
+    print('''*Example filtered_messages:\n''', filtered_messages)
+    return {"messages": filtered_messages}
+
 @app.post("/")
 def chat_completions_create(request: ChatRequest):
     print(f"Received: {request.message.content[0].text}")
-    
+    conversation_id = request.message.conversationId
     # only have one conversation for now
-    messages = select_messages(1)
+    messages = select_messages_by_conversation_id(conversation_id)
 
     # If it's a new conversation, add the system message
     # TODO try except
     if not messages:
         messages.append(system_message)
-        insert_message(1, system_message) 
+        insert_message(conversation_id, system_message) 
 
     new_user_message = {
-        "conversation_id": 1,
-        "message_id": str(uuid.uuid4()),
-        "role": "user",
-        "content": request.message.content
+      "conversation_id": conversation_id,
+      "message_id": str(uuid.uuid4()),
+      "role": "user",
+      "content": [content.dict() for content in request.message.content]
     }
     messages.append(new_user_message)
-    insert_message(1, new_user_message)
+    insert_message(conversation_id, new_user_message)
 
     limit = 3
     attempts = 0
@@ -121,15 +161,20 @@ def chat_completions_create(request: ChatRequest):
             messages=messages,
             tools=tool_schemas
         )
-
+        logger.debug(response.choices[0].message)
         response_message = {
             "role": response.choices[0].message.role,
-            "content": response.choices[0].message.content,
-            "tool_calls": json.dumps([tool_call.dict() for tool_call in response.choices[0].message.tool_calls]) if response.choices[0].message.tool_calls else None,
+            "content": [
+                {
+                    "type":"text",
+                    "text":response.choices[0].message.content
+                }
+            ],
+            "tool_calls": response.choices[0].message.tool_calls,
         }
-        logger.debug(response.choices[0])
-        messages.append(response.choices[0].message)
-        insert_message(1, response_message)
+        logger.debug(response_message)
+        messages.append(response_message)
+        insert_message(conversation_id, response_message)
 
 
         if response.choices[0].finish_reason == "tool_calls":
@@ -157,4 +202,4 @@ def chat_completions_create(request: ChatRequest):
                 insert_message(1, tool_message)
         else:
             logger.info(response.choices[0].message.content)
-            return {"message": response.choices[0].message.content}
+            return {"message": response_message}
