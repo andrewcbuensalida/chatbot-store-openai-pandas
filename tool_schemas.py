@@ -34,5 +34,12 @@ tool_schemas = [
                 "additionalProperties": False,
             },
         },
-    }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_product_columns",
+            "description": "Get the columns of the product data so you know what to sort by.",
+        },
+    },
 ]

@@ -1,18 +1,16 @@
 import json
 from db import insert_message, select_messages, select_messages_by_conversation_id
 from fastapi import FastAPI
-from orders_products_api import get_all_orders_data, get_orders_by_customer_id
+from orders_products_api import get_all_orders_data, get_orders_by_customer_id,get_product_columns
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import os
-import requests
 from dotenv import load_dotenv
 from loguru import logger
 from tool_schemas import tool_schemas, execute_tool_call
 from with_retries import with_retries
 from types_local import ChatRequest
-import csv
 import uuid
 
 load_dotenv()
@@ -35,7 +33,7 @@ app.add_middleware(
 
 current_agent = {
     "name": "Anderson",
-    "tools": [get_all_orders_data,get_orders_by_customer_id],
+    "tools": [get_all_orders_data,get_orders_by_customer_id,get_product_columns],
     "instructions": "You are a helpful assistant. You are here to help with orders data and products data. "
 }
 
