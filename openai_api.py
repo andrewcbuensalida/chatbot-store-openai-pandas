@@ -1,5 +1,7 @@
 import json
+from db import insert_message, select_messages, select_messages_by_conversation_id
 from fastapi import FastAPI
+from orders_products_api import get_all_orders_data, get_orders_by_customer_id
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
@@ -7,7 +9,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from loguru import logger
-from tools import tool_schemas, execute_tool_call
+from tool_schemas import tool_schemas, execute_tool_call
 from with_retries import with_retries
 from types_local import ChatRequest
 import csv
@@ -30,16 +32,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-orders_endpoint = os.getenv('ORDERS_ENDPOINT', "http://localhost:8001/data")
-
-# TODO try except
-def get_all_orders_data():
-    response = requests.get(orders_endpoint)
-    return response.json()[:3] # it's going to be too much to pass to openai if we don't limit it
-
-def get_orders_by_customer_id(customer_id): # example customer_id = 37077
-    response = requests.get(f"{orders_endpoint}/customer/{customer_id}")
-    return response.json()[:3] # it's going to be too much to pass to openai if we don't limit it
 
 current_agent = {
     "name": "Anderson",
@@ -62,56 +54,7 @@ def openai_chat_completion_create(**kwargs):
 
   return response
 
-@with_retries
-def select_messages(user_id):
-    logger.info(f"Selecting messages for user: {user_id}")
-    messages = []
-    # return messages # delete this line to turn on memory # need memory if getting orders by a certain filter
-    with open('messages.csv', mode='r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            if True:
-            # if int(row['user_id']) == user_id:
-                messages.append(
-                    {
-                        **row,
-                        "tool_calls": json.loads(row["tool_calls"]) if row["tool_calls"] else None
-                    }
-                )
-    return messages
 
-@with_retries
-def select_messages_by_conversation_id(conversation_id):
-    logger.info(f"Selecting messages for conversation: {conversation_id}")
-    messages = []
-    with open('messages.csv', mode='r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            if row['conversation_id'] == conversation_id:
-                messages.append(
-                    {
-                        **row,
-                        "tool_calls": json.loads(row["tool_calls"]) if row["tool_calls"] else None
-                    }
-                )
-    return messages
-
-@with_retries
-def insert_message(conversation_id, message):
-    logger.info(f"Inserting message: {message}")
-    message_id = str(uuid.uuid4())
-    with open('messages.csv', mode='a', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=['conversation_id', 'message_id', 'role', 'content',"tool_calls", "tool_call_id"])
-        writer.writerow(
-            {
-                "conversation_id": conversation_id,
-                "message_id": message_id,
-                **message,
-                "content": json.dumps(message.get('content')) if message.get('content') else None,
-                "tool_calls": json.dumps([tool_call.dict() for tool_call in message.get('tool_calls')]) if message.get('tool_calls') else None
-            }
-        )
-    return message_id # not really used
 
 @app.get('/health')
 def health_check():
@@ -164,11 +107,15 @@ def chat_completions_create(request: ChatRequest):
     # Loop so openai can respond to tool messages
     while attempts < limit:
         logger.info(f"Attempt {attempts + 1}/{limit}")
-        response = openai_chat_completion_create(
-            messages=messages,
-            tools=tool_schemas
-        )
-        logger.debug(response.choices[0].message)
+        try:
+            response = openai_chat_completion_create(
+                messages=messages,
+                tools=tool_schemas
+            )
+        except Exception as e:
+            logger.error(e)
+            return {"error": str(e)}
+        
         response_message = {
             "role": response.choices[0].message.role,
             "content": [
@@ -180,20 +127,28 @@ def chat_completions_create(request: ChatRequest):
             "tool_calls": response.choices[0].message.tool_calls,
             "conversation_id": conversation_id,
         }
-        logger.debug(response_message)
         messages.append(response_message)
-        insert_message(conversation_id, response_message)
-
+        try:
+            insert_message(conversation_id, response_message)
+        except Exception as e:
+            logger.error(e)
+            return {"error": str(e)}
 
         if response.choices[0].finish_reason == "tool_calls":
             # Loop through all tool calls and execute
             for tool_call in response.choices[0].message.tool_calls:
-                response = execute_tool_call(
-                    tool_call, 
-                    tools, 
-                    current_agent["name"]
-                )
-                logger.debug(response)
+                try:
+                    response = execute_tool_call(
+                        tool_call, 
+                        tools, 
+                        current_agent["name"]
+                    )
+                    logger.debug(response)
+                except Exception as e:  
+                    logger.error(e)
+                    response = {
+                        "error": str(e)
+                    }
 
                 tool_message = {
                     "role": "tool",
@@ -208,7 +163,12 @@ def chat_completions_create(request: ChatRequest):
                     "conversation_id": conversation_id,
                 }
                 messages.append(tool_message)
-                insert_message(1, tool_message)
+                try:
+                    insert_message(1, tool_message)
+                except Exception as e:
+                    # TODO need to delete the assistant's tool call from db
+                    logger.error(e)
+                    return {"error": str(e)}
         else:
             logger.info(response.choices[0].message.content)
             return {"message": response_message}

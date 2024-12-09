@@ -1,4 +1,8 @@
 Story,Task,Estimate min (hr),Estimate max (hr),Actual,Comment
 Setup virtual environment,Setup virtual environment,1 min,1 min, 1 min,
 Understand the existing code, Read the code, 30 min,1 hr,,
-Co 
+As a user the chatbot sure ask follow up questions if it needs more information. It should decide what endpoints to call based on the user's query.,Create the tool calling loop,1 hr,3 hr,3 hr,
+As a user the chatbot should remember previous messages,setup mock database using a csv,1 hr, 1hr, 1 hr,
+As a user the chatbot should know all orders and my own orders,connect orders endpoint,1 hr, 2 hr, 2 hr,
+As a user I want to interface with a ui,create a simple ui,1 hr, 2 hr, 3 hr,
+As a user I want to go to a website to use the chatbot,deploy backend to heroku and frontend to aws amplify,1 hr, 2 hr, 2 hr,
