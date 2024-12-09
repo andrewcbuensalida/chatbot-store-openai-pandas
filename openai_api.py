@@ -1,7 +1,7 @@
 import json
 from db import insert_message, select_messages, select_messages_by_conversation_id
 from fastapi import FastAPI
-from orders_products_api import get_all_orders_data, get_orders_by_customer_id,get_product_columns
+from orders_products_api import get_all_orders_data, get_orders_by_customer_id,get_product_columns,search_products
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
@@ -33,7 +33,7 @@ app.add_middleware(
 
 current_agent = {
     "name": "Anderson",
-    "tools": [get_all_orders_data,get_orders_by_customer_id,get_product_columns],
+    "tools": [get_all_orders_data,get_orders_by_customer_id,get_product_columns,search_products],
     "instructions": "You are a helpful assistant. You are here to help with orders data and products data. "
 }
 
@@ -63,14 +63,12 @@ def get_all_messages():
     logger.info(f"Getting all messages for user 1")
     messages = select_messages(1)
     filtered_messages = [message for message in messages if message['role'] in ['user', 'assistant'] and not message.get('tool_calls')]
-    print('''*Example filtered_messages:\n''', filtered_messages)
     return {"messages": filtered_messages}
 
 @app.post("/")
 def chat_completions_create(request: ChatRequest):
     print(f"Received: {request.message.content[0].text}")
     conversation_id = request.message.conversationId
-    print('''*Example conversation_id:\n''', conversation_id)
     # only have one conversation for now
     messages = select_messages_by_conversation_id(conversation_id)
 

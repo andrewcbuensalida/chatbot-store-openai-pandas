@@ -41,5 +41,36 @@ tool_schemas = [
             "name": "get_product_columns",
             "description": "Get the columns of the product data so you know what to sort by.",
         },
+    },    
+    {
+        "type": "function",
+        "function": {
+            "name": "search_products",
+            "description": "Search for products. You can specify a query, sort column, sort order, and limit. If you can't find what you're looking for, try a different query, maybe with more, or less keywords.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query.",
+                    },
+                    "sort_column": {
+                        "type": "string",
+                        "description": "The column to sort by.",
+                    },
+                    "sort_order": {
+                        "type": "string",
+                        "description": "The order to sort by.",
+                        "enum": ["asc", "desc"],
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "The maximum number of results to return. If the user says a number more than 10, mention the limit and ask for a smaller number.",
+                    },
+                },
+                "required": ["query", "sort_column", "sort_order", "limit"],
+                "additionalProperties": False,
+            }
+        },
     },
 ]
