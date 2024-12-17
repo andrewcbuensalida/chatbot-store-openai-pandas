@@ -46,7 +46,7 @@ tool_schemas = [
         "type": "function",
         "function": {
             "name": "search_products",
-            "description": "Search for products. You can specify a query, sort column, sort order, and limit. If you can't find what you're looking for, try a different query, maybe with more, or less keywords.",
+            "description": "Search for products. You can specify a query, sort column, sort order, and limit. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords.",
             "parameters": {
                 "type": "object",
                 "properties": {
