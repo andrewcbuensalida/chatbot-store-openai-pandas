@@ -46,7 +46,7 @@ tool_schemas = [
         "type": "function",
         "function": {
             "name": "search_products",
-            "description": "Search for products. You can specify a query, sort column, sort order, and limit. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords in the query, for example instead of 'BOYA BYM1 Microphone', your second search should be 'BOYA BYM1'.",
+            "description": "Search for products. You can specify a query, sort column, sort order, and limit. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords in the query, for example instead of 'BOYA BYM1 Microphone', your second search should be 'BOYA BYM1'. If the user gives a brand name, search using only the brand name, not the category. For example, if the user asks for 'Samsung phones', search for 'Samsung' only.",
             "parameters": {
                 "type": "object",
                 "properties": {
