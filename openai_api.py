@@ -34,7 +34,7 @@ app.add_middleware(
 current_agent = {
     "name": "Anderson",
     "tools": [get_all_orders_data,get_orders_by_customer_id,get_product_columns,search_products],
-    "instructions": "You are a helpful assistant. You are here to help with orders data and products data. Try using the tools first before you use your own knowledge. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords."
+    "instructions": "You are a helpful assistant. You are here to help with orders data and products data. Try using the tools first before you use your own knowledge. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords in the query, for example instead of 'BOYA BYM1 Microphone', your second search should be 'BOYA BYM1'."
 }
 
 tools = {tool.__name__: tool for tool in current_agent['tools']}

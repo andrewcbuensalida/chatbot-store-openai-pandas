@@ -46,13 +46,13 @@ tool_schemas = [
         "type": "function",
         "function": {
             "name": "search_products",
-            "description": "Search for products. You can specify a query, sort column, sort order, and limit. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords.",
+            "description": "Search for products. You can specify a query, sort column, sort order, and limit. IMPORTANT! If you can't find what you're looking for, try 2 more times, but with a different query, maybe with less keywords in the query, for example instead of 'BOYA BYM1 Microphone', your second search should be 'BOYA BYM1'.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "The search query.",
+                        "description": "The search query. Try using less keywords if you can't find what you're looking for, for example instead of 'BOYA BYM1 Microphone', your second search should be 'BOYA BYM1'.",
                     },
                     "sort_column": {
                         "type": "string",
