@@ -27,7 +27,7 @@ def get_product_columns():
 @with_retries
 def search_products(query, sort_column, sort_order,limit):
     logger.debug(f"Searching products with query: {query}, sort_column: {sort_column}, sort_order: {sort_order}, limit: {limit}")
-    if limit >10:
-        raise ValueError("Limit must be 10 or less")
+    if limit >5:
+        raise ValueError("Limit must be 5 or less")
     response = requests.get(f"{orders_endpoint}/search-products", params={"query": query, "sort_column": sort_column, "sort_order": sort_order, "limit": limit})
     return response.json()

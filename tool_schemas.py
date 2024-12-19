@@ -65,7 +65,7 @@ tool_schemas = [
                     },
                     "limit": {
                         "type": "integer",
-                        "description": "The maximum number of results to return. If the user says a number more than 10, mention the limit and ask for a smaller number.",
+                        "description": "The maximum number of results to return. If the user says a number more than 5, mention the limit and ask for a smaller number.",
                     },
                 },
                 "required": ["query", "sort_column", "sort_order", "limit"],
